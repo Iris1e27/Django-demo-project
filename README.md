@@ -28,16 +28,49 @@ A step-by-step demo from the [official tutorial website](https://docs.djangoproj
   - `python manage.py createsuperuser`
   - Generating admin sites for your staff or clients to add, change, and delete content is tedious work that doesn’t require much creativity. For that reason, Django entirely automates creation of admin interfaces for models.
   - `python manage.py runserver`
+  - To register your model to admin site, write like `admin.site.register(Choice)` in `polls/admin` page.
   - We changed polls/models.py, polls/admin.py and mysite/settings.py to migrate and manage databases and create admin site in Part 2.
 
 - [Writing your first Django app, part 3](https://docs.djangoproject.com/en/4.2/intro/tutorial03/)
-- The render() function takes the request object as its first argument, a template name as its second argument and a dictionary as its optional third argument. It returns an HttpResponse object of the given template rendered with the given context.
-- The get_object_or_404() function takes a Django model as its first argument and an arbitrary number of keyword arguments, which it passes to the get() function of the model’s manager. It raises Http404 if the object doesn’t exist.
-- There’s also a get_list_or_404() function, which works just as get_object_or_404() – except using filter() instead of get(). It raises Http404 if the list is empty.
-- We wrote new views. 
+  - The render() function takes the request object as its first argument, a template name as its second argument and a dictionary as its optional third argument. It returns an HttpResponse object of the given template rendered with the given context.
+  - The get_object_or_404() function takes a Django model as its first argument and an arbitrary number of keyword arguments, which it passes to the get() function of the model’s manager. It raises Http404 if the object doesn’t exist.
+  - There’s also a get_list_or_404() function, which works just as get_object_or_404() – except using filter() instead of get(). It raises Http404 if the list is empty.
+  - We wrote new views. 
 
 - [Writing your first Django app, part 4](https://docs.djangoproject.com/en/4.2/intro/tutorial04/)
-- 
+  - After posting form, you should write `return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))`
+  ```
+  app_name = "polls"
+  urlpatterns = [
+      path("", views.IndexView.as_view(), name="index"),
+      path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+      path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+      path("<int:question_id>/vote/", views.vote, name="vote"),
+  ]
+  ```
+  
+  ```
+  class IndexView(generic.ListView):
+      template_name = "polls/index.html"
+      context_object_name = "latest_question_list"
+  
+      def get_queryset(self):
+          """Return the last five published questions."""
+          return Question.objects.order_by("-pub_date")[:5]
+  
+  
+  class DetailView(generic.DetailView):
+      model = Question
+      template_name = "polls/detail.html"
+  
+  
+  class ResultsView(generic.DetailView):
+      model = Question
+      template_name = "polls/results.html"
+  ```
+
+  - We wrote vote view, rewrote new views by using generic view and amended url conf. 
+
 - [Writing your first Django app, part 5](https://docs.djangoproject.com/en/4.2/intro/tutorial05/)
 - 
 - [Writing your first Django app, part 6](https://docs.djangoproject.com/en/4.2/intro/tutorial06/)
